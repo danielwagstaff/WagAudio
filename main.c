@@ -13,6 +13,8 @@
 
 verbosity_t verbosity = VERBOSE_OFF;
 
+void display_playlist(char * plist);
+
 int main(int argc, char * argv[])
 {
     typedef enum
@@ -25,6 +27,7 @@ int main(int argc, char * argv[])
     char * filename;
     char * temp;
     char * read = "/mnt/usb/MUSIC/02.wav";
+    char * plist = NULL;
     char newfile[MAX_LINES];
     int fd=0;
     int i=0;
@@ -51,6 +54,7 @@ int main(int argc, char * argv[])
         if( strcmp(argv[i], "-p")==0 )
         {
             PLAYLIST = YES_PLAYLIST;
+            plist = argv[i+1];
             playlist = fopen(argv[i+1], "r");
         }
     }
@@ -58,6 +62,8 @@ int main(int argc, char * argv[])
     con_msg(MSG_INFO, "\n###############################\n"); 
     con_msg(MSG_INFO, "\n***** Welcome to WagAudio *****\n"); 
     con_msg(MSG_INFO, "\n###############################\n"); 
+
+    display_playlist(plist);
 
     while(read != NULL)
     {
@@ -146,6 +152,54 @@ int main(int argc, char * argv[])
         pthread_join(thread0, NULL);
     }
 
+    fclose(playlist);
     con_msg(MSG_INFO, "\n");
     return 0;
+}
+
+void display_playlist(char * plist)
+{
+    char buffer[MAX_LINES];
+    char * read = NULL;
+    FILE * playlist = NULL;
+    char * filename = NULL;
+    char * temp = NULL;
+
+    playlist = fopen(plist, "r");
+
+    con_msg(MSG_INFO, "\nPlaying:\n");
+
+    memset(buffer, 0, MAX_LINES);
+    do
+    {
+        read = fgets(buffer, (MAX_LINES-1), playlist);
+        if(read == NULL)
+        {
+            break;
+        }
+
+        //Determine filename
+        if( strchr(read, '/') != NULL )
+        {
+            filename=(read+(strlen(read)));
+ 
+            do{
+                temp=strchr(filename, '/');
+                filename -= 1;
+            }while(temp == NULL);
+ 
+            filename=filename+2;
+        }
+        else
+        {
+            filename=read;
+        }
+
+        con_msg(MSG_INFO, "%s", filename);
+
+    }while(read != NULL);
+
+   con_msg(MSG_INFO, "\n");
+
+    fclose(playlist);
 }
