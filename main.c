@@ -63,7 +63,10 @@ int main(int argc, char * argv[])
     con_msg(MSG_INFO, "\n***** Welcome to WagAudio *****\n"); 
     con_msg(MSG_INFO, "\n###############################\n"); 
 
-    display_playlist(plist);
+    if(PLAYLIST == YES_PLAYLIST)
+    {
+        display_playlist(plist);
+    }
 
     while(read != NULL)
     {
@@ -152,7 +155,10 @@ int main(int argc, char * argv[])
         pthread_join(thread0, NULL);
     }
 
-    fclose(playlist);
+    if(PLAYLIST == YES_PLAYLIST)
+    {
+        fclose(playlist);
+    }
     con_msg(MSG_INFO, "\n");
     return 0;
 }
